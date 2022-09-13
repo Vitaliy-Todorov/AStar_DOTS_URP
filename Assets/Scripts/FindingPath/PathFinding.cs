@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.FindingPath
 {
-    public class PathFinding : MonoBehaviour
+    public partial class PathFinding : MonoBehaviour
     {
         private const int MOVE_STRAIGHT_COST = 10;
         private const int MOVE_DIAGONAL_COST = 14;

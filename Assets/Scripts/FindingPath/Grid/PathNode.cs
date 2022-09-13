@@ -1,4 +1,5 @@
 ﻿using Unity.Mathematics;
+using UnityEngine;
 
 namespace Assets.Scripts.FindingPath.Grid
 {
@@ -11,5 +12,8 @@ namespace Assets.Scripts.FindingPath.Grid
         public int CameFromNodeIndex;
 
         public Cost Cost;
+
+        public bool IsWall;
+        public GameObject WallGO;
     }
 }
