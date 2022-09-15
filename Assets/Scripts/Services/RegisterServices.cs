@@ -1,19 +1,38 @@
 ﻿using Assets.Scripts.Services.InputServices;
 using System;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Assets.Scripts.Services
 {
-    public class RegisterServices : MonoBehaviour
+    //[AlwaysUpdateSystem]
+    public partial class RegisterServices : SystemBase
     {
         private AllServices _containerServices = AllServices.Container;
+        private World _world;
 
-        private void Awake()
+        protected override void OnCreate()
         {
-            _containerServices.RegisterSingle(InputKeyboardMouseService());
+            base.OnCreate();
+
+            _world = World.DefaultGameObjectInjectionWorld;
+
+            _containerServices.RegisterSingle(CreateSystemBase<InputKeyboardMouseService>());
+
+            Test test = CreateSystemBase<Test>();
+            test.Constract();
         }
 
-        private InputKeyboardMouseService InputKeyboardMouseService() => 
-            gameObject.AddComponent<InputKeyboardMouseService>();
+        protected override void OnUpdate() { }
+
+        private T CreateSystemBase<T>() where T : SystemBase
+        {
+            var systemGroup = _world.GetOrCreateSystem<SimulationSystemGroup>();
+            var system = _world.GetOrCreateSystem<T>();
+            systemGroup.AddSystemToUpdateList(system);
+            systemGroup.SortSystems();
+
+            return system;
+        }
     }
 }

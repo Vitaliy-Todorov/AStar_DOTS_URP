@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections;
+using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.Entities;
 
 namespace Assets.Scripts.FindingPath.Grid
 {
-    public class Grid 
+    public struct Grid 
     {
         private PathNode[,] _gridArray;
         private Vector3 _originPosition;
         private float _cellSize;
+
+        public float CellSize { get => _cellSize; }
 
         public Grid(int width, int height, float cellSize, Vector3 originPosition)
         {
@@ -52,6 +56,37 @@ namespace Assets.Scripts.FindingPath.Grid
             return currentPosition.x + currentPosition.y * max;
         }
 
+        private Vector3 GridCorners(int x, int y) =>
+            GetWorldPosition(x, y) - new Vector3(1, 1, 0) * .5f * _cellSize;
+
+        #region Wall
+        public bool IsWall(Vector3 positionInWorld)
+        {
+            int2 positionInGrid = PositionInGrid(positionInWorld);
+
+            return PositionToGrid(positionInWorld) && _gridArray[positionInGrid.x, positionInGrid.y].IsWall;
+        }
+
+        public void SetWall(Vector3 positon, Entity entity, ref Translation translationWall)
+        {
+            int2 positionInGrid = PositionInGrid(positon);
+            Vector3 positionInGridWorld = GetWorldPosition(positionInGrid.x, positionInGrid.y);
+
+            translationWall.Value = positionInGridWorld;
+
+            _gridArray[positionInGrid.x, positionInGrid.y].IsWall = true;
+            _gridArray[positionInGrid.x, positionInGrid.y].WallEntity = entity;
+        }
+
+        public void DestroyWall(Vector3 positon, EntityCommandBuffer ecb)
+        {
+            int2 positionInGrid = PositionInGrid(positon);
+            _gridArray[positionInGrid.x, positionInGrid.y].IsWall = false;
+            ecb.DestroyEntity(_gridArray[positionInGrid.x, positionInGrid.y].WallEntity);
+        }
+        #endregion
+
+        #region Position
         public bool PositionToGrid(Vector3 positon)
         {
             int2 positionInGrid = PositionInGrid(positon);
@@ -65,53 +100,10 @@ namespace Assets.Scripts.FindingPath.Grid
                 return false;
         }
 
-        public void SetIsWall(bool isWall, Vector3 positon)
-        {
-            int2 positionInGrid = PositionInGrid(positon);
-            _gridArray[positionInGrid.x, positionInGrid.y].IsWall = isWall;
-        }
-
-        public bool IsWall(bool isWall, Vector3 positon)
-        {
-            int2 positionInGrid = PositionInGrid(positon);
-            return _gridArray[positionInGrid.x, positionInGrid.y].IsWall;
-        }
-
-        public void SetWall(Vector3 positon, GameObject prefabWall)
-        {
-            int2 positionInGrid = PositionInGrid(positon);
-            Vector3 positionInGridWorld = GetWorldPosition(positionInGrid.x, positionInGrid.y);
-
-            GameObject wall = UnityEngine.Object.Instantiate(prefabWall, positionInGridWorld, Quaternion.identity);
-            wall.transform.localScale = new Vector3(_cellSize, _cellSize, 0);
-
-            _gridArray[positionInGrid.x, positionInGrid.y].IsWall = true;
-            _gridArray[positionInGrid.x, positionInGrid.y].WallGO = wall;
-        }
-
-        public void DestroyWall(Vector3 positon)
-        {
-            int2 positionInGrid = PositionInGrid(positon);
-            _gridArray[positionInGrid.x, positionInGrid.y].IsWall = false;
-            UnityEngine.Object.Destroy(_gridArray[positionInGrid.x, positionInGrid.y].WallGO);
-        }
-
         public Vector3 PositionInGridWorld(Vector3 positionInWorld)
         {
             int2 positionInGridInt = PositionInGrid(positionInWorld);
             return GetWorldPosition(positionInGridInt.x, positionInGridInt.y);
-        }
-
-        public bool IsWall(Vector3 positionInWorld)
-        {
-            int2 positionInGrid = PositionInGrid(positionInWorld);
-
-            return PositionToGrid(positionInWorld) && _gridArray[positionInGrid.x, positionInGrid.y].IsWall;
-        }
-
-        private Vector3 GridCorners(int x, int y)
-        {
-            return GetWorldPosition(x, y) - new Vector3(1, 1, 0) * .5f * _cellSize;
         }
 
         private Vector3 GetWorldPosition(int x, int y)
@@ -127,5 +119,6 @@ namespace Assets.Scripts.FindingPath.Grid
 
             return new int2(x, y);
         }
+        #endregion
     }
 }

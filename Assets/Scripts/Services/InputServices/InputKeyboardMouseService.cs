@@ -1,9 +1,11 @@
-﻿using Unity.Mathematics;
+﻿using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Assets.Scripts.Services.InputServices
 {
-    public class InputKeyboardMouseService : MonoBehaviour, IService
+    [DisableAutoCreation]
+    public partial class InputKeyboardMouseService : SystemBase, IService
     {
         private readonly string _vertical = "Vertical";
         private readonly string _horizontal = "Horizontal";
@@ -34,7 +36,7 @@ namespace Assets.Scripts.Services.InputServices
             }
         }
 
-        private void Update()
+        protected override void OnUpdate()
         {
             if (Input.GetMouseButtonDown(0))
             {

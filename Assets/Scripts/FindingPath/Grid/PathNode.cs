@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Assets.Scripts.FindingPath.Grid
@@ -14,6 +15,6 @@ namespace Assets.Scripts.FindingPath.Grid
         public Cost Cost;
 
         public bool IsWall;
-        public GameObject WallGO;
+        public Entity WallEntity;
     }
 }
