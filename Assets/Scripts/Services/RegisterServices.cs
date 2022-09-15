@@ -19,7 +19,7 @@ namespace Assets.Scripts.Services
 
             _containerServices.RegisterSingle(CreateSystemBase<InputKeyboardMouseService>());
 
-            Test test = CreateSystemBase<Test>();
+            GridSystem test = CreateSystemBase<GridSystem>();
             test.Constract();
         }
 

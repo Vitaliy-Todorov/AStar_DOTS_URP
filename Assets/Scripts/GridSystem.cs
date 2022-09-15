@@ -12,7 +12,7 @@ namespace Assets.Scripts
     //[AlwaysUpdateSystem]
     //[UpdateAfter(typeof(RegisterServices))]
     [DisableAutoCreation]
-    public partial class Test : SystemBase
+    public partial class GridSystem : SystemBase
     {
         private InputKeyboardMouseService _inputService;
         private Click _click;

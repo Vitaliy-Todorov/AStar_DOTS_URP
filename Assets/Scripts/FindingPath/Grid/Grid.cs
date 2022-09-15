@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using Unity.Transforms;
+﻿using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.Entities;
